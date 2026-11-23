@@ -32,8 +32,8 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
-    @PutMapping(params = "id")
-    public ResponseEntity<StudentResponse> updateStudent(@RequestParam Long id, @RequestBody StudentRequest req) {
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentResponse> updateStudent(@PathVariable Long id, @RequestBody StudentRequest req) {
         return ResponseEntity.ok(studentService.updateStudent(id, req));
     }
 
