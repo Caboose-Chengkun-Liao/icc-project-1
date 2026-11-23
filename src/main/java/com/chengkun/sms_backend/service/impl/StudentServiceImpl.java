@@ -10,15 +10,20 @@ import com.chengkun.sms_backend.repository.StudentsRepository;
 import com.chengkun.sms_backend.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class StudentServiceImpl implements StudentService {
     private final StudentsRepository studentsRepository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     public StudentResponse createStudent(StudentRequest req) {
         if(studentsRepository.existsByEmail(req.email()))
             throw new DuplicateResourceException("Email " + req.email() + " already exists");
@@ -45,6 +50,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
     public StudentResponse updateStudent(Long studentId, StudentRequest req) {
         Student student = studentsRepository.findById(studentId).orElseThrow(
                 () -> new ResourceNotFoundException(
@@ -56,12 +62,11 @@ public class StudentServiceImpl implements StudentService {
         student.setLastName(req.lastName());
         student.setEmail(req.email());
 
-        Student updated = studentsRepository.save(student);
-
-        return StudentMapper.toResponse(updated);
+        return StudentMapper.toResponse(student);
     }
 
     @Override
+    @Transactional
     public void deleteStudent(Long studentId) {
         Student student = studentsRepository.findById(studentId).orElseThrow(
                 () -> new ResourceNotFoundException(
