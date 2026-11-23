@@ -3,6 +3,7 @@ package com.chengkun.sms_backend.service.impl;
 import com.chengkun.sms_backend.dto.StudentRequest;
 import com.chengkun.sms_backend.dto.StudentResponse;
 import com.chengkun.sms_backend.entity.Student;
+import com.chengkun.sms_backend.exception.DuplicateResourceException;
 import com.chengkun.sms_backend.exception.ResourceNotFoundException;
 import com.chengkun.sms_backend.mapper.StudentMapper;
 import com.chengkun.sms_backend.repository.StudentsRepository;
@@ -19,6 +20,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentResponse createStudent(StudentRequest req) {
+        if(studentsRepository.existsByEmail(req.email()))
+            throw new DuplicateResourceException("Email " + req.email() + " already exists");
         Student student = StudentMapper.toEntity(req);
         Student savedStudent = studentsRepository.save(student);
         return StudentMapper.toResponse(savedStudent);
