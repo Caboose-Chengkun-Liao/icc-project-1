@@ -3,6 +3,7 @@ package com.chengkun.sms_backend.controller;
 import com.chengkun.sms_backend.dto.StudentRequest;
 import com.chengkun.sms_backend.dto.StudentResponse;
 import com.chengkun.sms_backend.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class StudentController {
     private final StudentService studentService;
 
     @PostMapping
-    public ResponseEntity<StudentResponse> createStudent(@RequestBody StudentRequest req) {
+    public ResponseEntity<StudentResponse> createStudent(@RequestBody @Valid StudentRequest req) {
         StudentResponse savedStudent = studentService.createStudent(req);
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
@@ -33,7 +34,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StudentResponse> updateStudent(@PathVariable Long id, @RequestBody StudentRequest req) {
+    public ResponseEntity<StudentResponse> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentRequest req) {
         return ResponseEntity.ok(studentService.updateStudent(id, req));
     }
 
